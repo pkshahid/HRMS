@@ -1,0 +1,270 @@
+import {
+  LayoutDashboard,
+  Users,
+  CalendarCheck,
+  PalmtreeIcon,
+  Wallet,
+  Receipt,
+  Building2,
+  Settings,
+  FileText,
+  CalendarDays,
+  Target,
+  ClipboardCheck,
+  Star,
+  TrendingUp,
+  CreditCard,
+  HandCoins,
+  Bell,
+  UserCog,
+  type LucideIcon,
+} from "lucide-react";
+import { UserRole } from "@prisma/client";
+
+export type NavItem = {
+  label: string;
+  href: string;
+  icon: LucideIcon;
+  roles: UserRole[];
+  group: string;
+};
+
+export const NAV_ITEMS: NavItem[] = [
+  {
+    label: "Dashboard",
+    href: "/dashboard",
+    icon: LayoutDashboard,
+    roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MANAGER, UserRole.STAFF, UserRole.EMPLOYEE],
+    group: "Main",
+  },
+  {
+    label: "Tenants",
+    href: "/super-admin/tenants",
+    icon: Building2,
+    roles: [UserRole.SUPER_ADMIN],
+    group: "Super Admin",
+  },
+  {
+    label: "Employees",
+    href: "/employees",
+    icon: Users,
+    roles: [UserRole.ADMIN, UserRole.MANAGER, UserRole.STAFF],
+    group: "Workforce",
+  },
+  {
+    label: "My Profile",
+    href: "/profile",
+    icon: FileText,
+    roles: [UserRole.EMPLOYEE, UserRole.MANAGER, UserRole.STAFF, UserRole.ADMIN],
+    group: "Workforce",
+  },
+  {
+    label: "Departments",
+    href: "/departments",
+    icon: Building2,
+    roles: [UserRole.ADMIN, UserRole.MANAGER],
+    group: "Workforce",
+  },
+  {
+    label: "Attendance",
+    href: "/attendance",
+    icon: CalendarCheck,
+    roles: [UserRole.ADMIN, UserRole.MANAGER, UserRole.STAFF],
+    group: "Time",
+  },
+  {
+    label: "My Attendance",
+    href: "/attendance/me",
+    icon: CalendarCheck,
+    roles: [UserRole.EMPLOYEE],
+    group: "Time",
+  },
+  {
+    label: "Holidays",
+    href: "/holidays",
+    icon: CalendarDays,
+    roles: [UserRole.ADMIN, UserRole.MANAGER, UserRole.STAFF, UserRole.EMPLOYEE],
+    group: "Time",
+  },
+  {
+    label: "Vacation / Leave",
+    href: "/leaves",
+    icon: PalmtreeIcon,
+    roles: [UserRole.ADMIN, UserRole.MANAGER, UserRole.STAFF],
+    group: "Time",
+  },
+  {
+    label: "My Leaves",
+    href: "/leaves/me",
+    icon: PalmtreeIcon,
+    roles: [UserRole.EMPLOYEE],
+    group: "Time",
+  },
+  {
+    label: "Apply Leave",
+    href: "/leaves/apply",
+    icon: PalmtreeIcon,
+    roles: [UserRole.EMPLOYEE, UserRole.MANAGER, UserRole.STAFF],
+    group: "Time",
+  },
+  {
+    label: "Salary Structures",
+    href: "/salary",
+    icon: Wallet,
+    roles: [UserRole.ADMIN, UserRole.STAFF],
+    group: "Payroll",
+  },
+  {
+    label: "Payroll Runs",
+    href: "/payroll",
+    icon: Receipt,
+    roles: [UserRole.ADMIN, UserRole.STAFF, UserRole.MANAGER],
+    group: "Payroll",
+  },
+  {
+    label: "My Payslips",
+    href: "/payroll/me",
+    icon: Receipt,
+    roles: [UserRole.EMPLOYEE],
+    group: "Payroll",
+  },
+  // Expenses & Advances
+  {
+    label: "Expenses",
+    href: "/expenses",
+    icon: CreditCard,
+    roles: [UserRole.ADMIN, UserRole.MANAGER, UserRole.STAFF],
+    group: "Finance",
+  },
+  {
+    label: "My Expenses",
+    href: "/expenses/me",
+    icon: CreditCard,
+    roles: [UserRole.EMPLOYEE, UserRole.MANAGER, UserRole.STAFF],
+    group: "Finance",
+  },
+  {
+    label: "Submit Expense",
+    href: "/expenses/submit",
+    icon: CreditCard,
+    roles: [UserRole.EMPLOYEE, UserRole.MANAGER, UserRole.STAFF, UserRole.ADMIN],
+    group: "Finance",
+  },
+  {
+    label: "Advance Payments",
+    href: "/advances",
+    icon: HandCoins,
+    roles: [UserRole.ADMIN, UserRole.MANAGER, UserRole.STAFF],
+    group: "Finance",
+  },
+  {
+    label: "My Advances",
+    href: "/advances/me",
+    icon: HandCoins,
+    roles: [UserRole.EMPLOYEE, UserRole.MANAGER, UserRole.STAFF],
+    group: "Finance",
+  },
+  {
+    label: "Request Advance",
+    href: "/advances/request",
+    icon: HandCoins,
+    roles: [UserRole.EMPLOYEE, UserRole.MANAGER, UserRole.STAFF, UserRole.ADMIN],
+    group: "Finance",
+  },
+  // Performance & Reviews
+  {
+    label: "Review Cycles",
+    href: "/performance/cycles",
+    icon: ClipboardCheck,
+    roles: [UserRole.ADMIN, UserRole.MANAGER, UserRole.STAFF],
+    group: "Performance",
+  },
+  {
+    label: "Reviews",
+    href: "/performance/reviews",
+    icon: Star,
+    roles: [UserRole.ADMIN, UserRole.MANAGER, UserRole.STAFF],
+    group: "Performance",
+  },
+  {
+    label: "Goals & KPIs",
+    href: "/performance/goals",
+    icon: Target,
+    roles: [UserRole.ADMIN, UserRole.MANAGER, UserRole.STAFF],
+    group: "Performance",
+  },
+  {
+    label: "360 Feedback",
+    href: "/performance/feedback",
+    icon: TrendingUp,
+    roles: [UserRole.ADMIN, UserRole.MANAGER, UserRole.STAFF],
+    group: "Performance",
+  },
+  {
+    label: "My Review",
+    href: "/performance/my-review",
+    icon: Star,
+    roles: [UserRole.EMPLOYEE, UserRole.MANAGER, UserRole.STAFF],
+    group: "Performance",
+  },
+  {
+    label: "My Goals",
+    href: "/performance/my-goals",
+    icon: Target,
+    roles: [UserRole.EMPLOYEE, UserRole.MANAGER, UserRole.STAFF],
+    group: "Performance",
+  },
+  {
+    label: "My Feedback",
+    href: "/performance/my-feedback",
+    icon: TrendingUp,
+    roles: [UserRole.EMPLOYEE, UserRole.MANAGER, UserRole.STAFF],
+    group: "Performance",
+  },
+  {
+    label: "Give Feedback",
+    href: "/performance/feedback/give",
+    icon: TrendingUp,
+    roles: [UserRole.EMPLOYEE, UserRole.MANAGER, UserRole.STAFF, UserRole.ADMIN],
+    group: "Performance",
+  },
+  {
+    label: "Settings",
+    href: "/settings",
+    icon: Settings,
+    roles: [UserRole.ADMIN],
+    group: "System",
+  },
+  {
+    label: "Developer Settings",
+    href: "/settings/developer",
+    icon: Settings,
+    roles: [UserRole.ADMIN],
+    group: "System",
+  },
+  {
+    label: "User Management",
+    href: "/users",
+    icon: UserCog,
+    roles: [UserRole.ADMIN],
+    group: "System",
+  },
+  {
+    label: "My Notifications",
+    href: "/notifications",
+    icon: Bell,
+    roles: [UserRole.EMPLOYEE, UserRole.MANAGER, UserRole.STAFF, UserRole.ADMIN],
+    group: "System",
+  },
+  {
+    label: "All Users",
+    href: "/super-admin/users",
+    icon: UserCog,
+    roles: [UserRole.SUPER_ADMIN],
+    group: "Super Admin",
+  },
+];
+
+export function navForRole(role: UserRole): NavItem[] {
+  return NAV_ITEMS.filter((item) => item.roles.includes(role));
+}
