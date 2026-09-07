@@ -5,6 +5,11 @@ import { Providers } from "@/components/providers";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
+// This app is fully database/auth-driven — no pages can be statically prerendered.
+// Force dynamic rendering so Vercel doesn't attempt SSG at build time (which fails
+// because NEXTAUTH_URL / DATABASE_URL are only available at runtime).
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "WorkHub — Attendance, Payroll & Vacation",
   description:
