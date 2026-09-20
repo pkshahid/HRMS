@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { PageHeader } from "@/components/ui/page";
 import { UserRole } from "@prisma/client";
 import { SalaryListClient } from "@/components/salary/salary-list-client";
+import { normalizeCurrency } from "@/lib/currency";
 
 export default async function SalaryPage({
   searchParams,
@@ -24,7 +25,7 @@ export default async function SalaryPage({
     prisma.tenant.findUnique({ where: { id: user.tenantId! } }),
   ]);
 
-  const currency = tenant?.currency || "AED";
+  const tenantCurrency = normalizeCurrency(tenant?.currency);
   const structureMap = new Map(structures.map((s) => [s.employeeId, s]));
 
   return (
@@ -35,22 +36,26 @@ export default async function SalaryPage({
       />
 
       <SalaryListClient
-        employees={employees.map((e) => ({
-          id: e.id,
-          name: `${e.firstName} ${e.lastName}`,
-          code: e.employeeCode,
-          designation: e.designation,
-          department: e.department?.name || "—",
-          hasStructure: structureMap.has(e.id),
-          gross: structureMap.get(e.id)
-            ? Number(structureMap.get(e.id)!.basicSalary) +
-              Number(structureMap.get(e.id)!.housingAllowance) +
-              Number(structureMap.get(e.id)!.transportAllowance) +
-              Number(structureMap.get(e.id)!.foodAllowance) +
-              Number(structureMap.get(e.id)!.otherAllowance)
-            : null,
-        }))}
-        currency={currency}
+        employees={employees.map((e) => {
+          const s = structureMap.get(e.id);
+          return {
+            id: e.id,
+            name: `${e.firstName} ${e.lastName}`,
+            code: e.employeeCode,
+            designation: e.designation,
+            department: e.department?.name || "—",
+            hasStructure: !!s,
+            currency: s ? normalizeCurrency(s.currency, tenantCurrency) : tenantCurrency,
+            gross: s
+              ? Number(s.basicSalary) +
+                Number(s.housingAllowance) +
+                Number(s.transportAllowance) +
+                Number(s.foodAllowance) +
+                Number(s.otherAllowance)
+              : null,
+          };
+        })}
+        currency={tenantCurrency}
         preselectEmployeeId={searchParams.employee}
       />
     </>

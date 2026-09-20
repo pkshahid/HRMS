@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { PageHeader } from "@/components/ui/page";
 import { UserRole } from "@prisma/client";
 import { SubmitExpenseForm } from "@/components/expenses/submit-expense-form";
+import { normalizeCurrency } from "@/lib/currency";
 
 export default async function SubmitExpensePage() {
   const user = await requireAuth();
@@ -29,7 +30,7 @@ export default async function SubmitExpensePage() {
         employees={employees}
         defaultEmployeeId={user.employeeId}
         canChoose={canChooseEmployee}
-        currency={tenant?.currency || "AED"}
+        currency={normalizeCurrency(tenant?.currency)}
       />
     </>
   );

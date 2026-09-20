@@ -15,6 +15,7 @@ import {
   Wallet,
 } from "lucide-react";
 import { UserRole, LeaveStatus } from "@prisma/client";
+import { normalizeCurrency } from "@/lib/currency";
 
 export default async function DashboardPage() {
   const user = await requireAuth();
@@ -22,7 +23,8 @@ export default async function DashboardPage() {
   if (user.role === UserRole.SUPER_ADMIN) {
     return <SuperAdminDashboard />;
   }
-  return <TenantDashboard tenantId={user.tenantId!} currency="AED" role={user.role} />;
+  const tenant = await prisma.tenant.findUnique({ where: { id: user.tenantId! }, select: { currency: true } });
+  return <TenantDashboard tenantId={user.tenantId!} currency={normalizeCurrency(tenant?.currency)} role={user.role} />;
 }
 
 async function SuperAdminDashboard() {
@@ -153,7 +155,7 @@ async function TenantDashboard({ tenantId, currency, role }: { tenantId: string;
                   <div className="text-xs text-ink-500">{formatDate(p.periodStart)} → {formatDate(p.periodEnd)} · {p.itemCount} employees</div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="text-sm font-medium text-ink-900">{formatCurrency(p.totalNet, currency)}</span>
+                  <span className="text-sm font-medium text-ink-900">{formatCurrency(p.totalNet, normalizeCurrency(p.currency, currency))}</span>
                   <StatusBadge status={p.status} />
                 </div>
               </div>

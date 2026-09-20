@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, Save } from "lucide-react";
+import { CurrencySelect } from "@/components/ui/currency-select";
 
 type Emp = { id: string; firstName: string; lastName: string; employeeCode: string };
 
@@ -19,7 +20,7 @@ export function RequestAdvanceForm({
   employees,
   defaultEmployeeId,
   canChoose,
-  currency,
+  currency: currencyProp,
 }: {
   employees: Emp[];
   defaultEmployeeId: string | null;
@@ -32,6 +33,7 @@ export function RequestAdvanceForm({
 
   const [employeeId, setEmployeeId] = useState(defaultEmployeeId || "");
   const [type, setType] = useState("SALARY_ADVANCE");
+  const [currency, setCurrency] = useState(currencyProp);
   const [amount, setAmount] = useState("");
   const [reason, setReason] = useState("");
   const [installments, setInstallments] = useState("1");
@@ -104,6 +106,10 @@ export function RequestAdvanceForm({
                 <option key={t.value} value={t.value}>{t.label}</option>
               ))}
             </select>
+          </div>
+          <div>
+            <label className="label">Currency</label>
+            <CurrencySelect value={currency} onChange={setCurrency} />
           </div>
           <div>
             <label className="label">Amount ({currency}) <span className="text-red-500">*</span></label>

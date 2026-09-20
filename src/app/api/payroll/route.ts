@@ -3,11 +3,13 @@ import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/auth";
 import { UserRole, PayrollStatus, AttendanceStatus } from "@prisma/client";
 import { z } from "zod";
+import { normalizeCurrency } from "@/lib/currency";
 
 const generateSchema = z.object({
   periodStart: z.string(),
   periodEnd: z.string(),
   name: z.string().optional(),
+  currency: z.string().optional(),
 });
 
 export async function GET() {
@@ -38,6 +40,10 @@ export async function POST(req: NextRequest) {
 
   const name = d.name || `${periodStart.toLocaleString("en", { month: "long" })} ${periodStart.getFullYear()}`;
 
+  // Resolve the payroll run currency: explicit → tenant default → AED
+  const tenant = await prisma.tenant.findUnique({ where: { id: user.tenantId! }, select: { currency: true } });
+  const payrollCurrency = normalizeCurrency(d.currency, tenant?.currency || "AED");
+
   // get all active employees with salary structures
   const employees = await prisma.employee.findMany({
     where: { tenantId: user.tenantId!, status: "ACTIVE" },
@@ -54,6 +60,7 @@ export async function POST(req: NextRequest) {
       periodStart,
       periodEnd,
       status: PayrollStatus.DRAFT,
+      currency: payrollCurrency,
       itemCount: withSalary.length,
     },
   });
@@ -98,6 +105,7 @@ export async function POST(req: NextRequest) {
         payrollId: payroll.id,
         tenantId: user.tenantId!,
         employeeId: emp.id,
+        currency: normalizeCurrency(s.currency, payrollCurrency),
         basicSalary: basic,
         totalAllowances: allowances,
         overtimeAmount,

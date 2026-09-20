@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, Save, Plus, Trash2 } from "lucide-react";
+import { CurrencySelect } from "@/components/ui/currency-select";
 
 type Emp = { id: string; firstName: string; lastName: string; employeeCode: string };
 
@@ -22,7 +23,7 @@ export function SubmitExpenseForm({
   employees,
   defaultEmployeeId,
   canChoose,
-  currency,
+  currency: currencyProp,
 }: {
   employees: Emp[];
   defaultEmployeeId: string | null;
@@ -35,6 +36,7 @@ export function SubmitExpenseForm({
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [employeeId, setEmployeeId] = useState(defaultEmployeeId || "");
+  const [currency, setCurrency] = useState(currencyProp);
   const [periodStart, setPeriodStart] = useState("");
   const [periodEnd, setPeriodEnd] = useState("");
   const [items, setItems] = useState<ItemRow[]>([
@@ -151,6 +153,10 @@ export function SubmitExpenseForm({
               value={periodEnd}
               onChange={(e) => setPeriodEnd(e.target.value)}
             />
+          </div>
+          <div>
+            <label className="label">Currency</label>
+            <CurrencySelect value={currency} onChange={setCurrency} />
           </div>
           <div className="sm:col-span-2">
             <label className="label">Description</label>

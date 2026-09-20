@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, Save } from "lucide-react";
+import { CurrencySelect } from "@/components/ui/currency-select";
 
 type Tenant = {
   id: string;
@@ -62,7 +63,7 @@ export function SettingsClient({ tenant }: { tenant: Tenant }) {
           </div>
           <div>
             <label className="label">Currency</label>
-            <input className="input" value={form.currency} onChange={(e) => set("currency", e.target.value)} />
+            <CurrencySelect value={form.currency} onChange={(v) => set("currency", v)} />
           </div>
           <div>
             <label className="label">Timezone</label>

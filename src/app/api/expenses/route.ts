@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/auth";
 import { UserRole, ExpenseStatus, ExpenseCategory } from "@prisma/client";
 import { z } from "zod";
+import { normalizeCurrency } from "@/lib/currency";
 
 const itemSchema = z.object({
   category: z.enum([
@@ -88,7 +89,7 @@ export async function POST(req: NextRequest) {
       title: d.title,
       description: d.description || null,
       totalAmount,
-      currency: d.currency || "AED",
+      currency: normalizeCurrency(d.currency),
       periodStart: toDate(d.periodStart),
       periodEnd: toDate(d.periodEnd),
       submittedAt: new Date(),

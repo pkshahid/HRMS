@@ -8,6 +8,7 @@ import { UserRole } from "@prisma/client";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { PrintButton } from "@/components/ui/print-button";
+import { normalizeCurrency } from "@/lib/currency";
 
 export default async function PayslipPage({
   params,
@@ -27,7 +28,9 @@ export default async function PayslipPage({
   if (user.role === UserRole.EMPLOYEE && item.employeeId !== user.employeeId) notFound();
 
   const tenant = await prisma.tenant.findUnique({ where: { id: user.tenantId! } });
-  const currency = tenant?.currency || "AED";
+  const tenantCurrency = normalizeCurrency(tenant?.currency);
+  const payrollCurrency = normalizeCurrency(item.payroll.currency, tenantCurrency);
+  const currency = normalizeCurrency(item.currency, payrollCurrency);
 
   const gross = Number(item.grossPay);
   const net = Number(item.netPay);
@@ -54,7 +57,10 @@ export default async function PayslipPage({
               <div className="text-base font-semibold text-ink-900 sm:text-lg">{tenant?.name || "Company"}</div>
               <div className="text-sm text-ink-500">Payslip · {item.payroll.name}</div>
             </div>
-            <StatusBadge status={item.payroll.status} />
+            <div className="flex items-center gap-3">
+              <span className="text-xs font-mono text-ink-500">{currency}</span>
+              <StatusBadge status={item.payroll.status} />
+            </div>
           </div>
 
           {/* employee info */}

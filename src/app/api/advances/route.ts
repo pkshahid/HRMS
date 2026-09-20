@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/auth";
 import { UserRole, AdvanceType, AdvanceStatus } from "@prisma/client";
 import { z } from "zod";
+import { normalizeCurrency } from "@/lib/currency";
 
 const createSchema = z.object({
   employeeId: z.string().optional(),
@@ -63,7 +64,7 @@ export async function POST(req: NextRequest) {
       type: (d.type as AdvanceType) || AdvanceType.SALARY_ADVANCE,
       status: AdvanceStatus.PENDING,
       amount: d.amount,
-      currency: d.currency || "AED",
+      currency: normalizeCurrency(d.currency),
       reason: d.reason || null,
       installments,
       installmentAmount,

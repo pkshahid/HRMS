@@ -8,6 +8,7 @@ import { UserRole } from "@prisma/client";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { PayrollActions } from "@/components/payroll/payroll-actions";
+import { normalizeCurrency } from "@/lib/currency";
 
 export default async function PayrollDetailPage({ params }: { params: { id: string } }) {
   const user = await requireRole(UserRole.ADMIN, UserRole.STAFF, UserRole.MANAGER);
@@ -21,7 +22,8 @@ export default async function PayrollDetailPage({ params }: { params: { id: stri
   ]);
 
   if (!payroll || payroll.tenantId !== user.tenantId) notFound();
-  const currency = tenant?.currency || "AED";
+  const tenantCurrency = normalizeCurrency(tenant?.currency);
+  const payrollCurrency = normalizeCurrency(payroll.currency, tenantCurrency);
   const canManage = user.role === UserRole.ADMIN || user.role === UserRole.STAFF;
 
   return (
@@ -39,13 +41,14 @@ export default async function PayrollDetailPage({ params }: { params: { id: stri
 
       <div className="mb-6 flex items-center gap-3">
         <StatusBadge status={payroll.status} />
+        <span className="text-xs font-mono text-ink-500">{payrollCurrency}</span>
         {payroll.payDate && <span className="text-sm text-ink-500">Paid on {formatDate(payroll.payDate)}</span>}
       </div>
 
       <div className="mb-6 grid gap-4 sm:grid-cols-3">
-        <SummaryCard label="Total Gross" value={formatCurrency(payroll.totalGross, currency)} accent="text-brand-700 bg-brand-50" />
-        <SummaryCard label="Total Deductions" value={formatCurrency(payroll.totalDeductions, currency)} accent="text-red-700 bg-red-50" />
-        <SummaryCard label="Total Net Pay" value={formatCurrency(payroll.totalNet, currency)} accent="text-emerald-700 bg-emerald-50" />
+        <SummaryCard label="Total Gross" value={formatCurrency(payroll.totalGross, payrollCurrency)} accent="text-brand-700 bg-brand-50" />
+        <SummaryCard label="Total Deductions" value={formatCurrency(payroll.totalDeductions, payrollCurrency)} accent="text-red-700 bg-red-50" />
+        <SummaryCard label="Total Net Pay" value={formatCurrency(payroll.totalNet, payrollCurrency)} accent="text-emerald-700 bg-emerald-50" />
       </div>
 
       <div className="card overflow-hidden">
@@ -57,7 +60,9 @@ export default async function PayrollDetailPage({ params }: { params: { id: stri
               </tr>
             </thead>
             <tbody>
-              {payroll.items.map((item) => (
+              {payroll.items.map((item) => {
+                const itemCur = normalizeCurrency(item.currency, payrollCurrency);
+                return (
                 <tr key={item.id}>
                   <td data-label="Employee">
                     <div className="flex items-center gap-3">
@@ -70,12 +75,12 @@ export default async function PayrollDetailPage({ params }: { params: { id: stri
                       </div>
                     </div>
                   </td>
-                  <td data-label="Basic">{formatCurrency(item.basicSalary, currency)}</td>
-                  <td data-label="Allowances">{formatCurrency(item.totalAllowances, currency)}</td>
-                  <td data-label="Overtime">{formatCurrency(item.overtimeAmount, currency)}</td>
-                  <td data-label="Deductions" className="text-red-600">{formatCurrency(item.totalDeductions, currency)}</td>
-                  <td data-label="Gross">{formatCurrency(item.grossPay, currency)}</td>
-                  <td data-label="Net Pay" className="font-semibold text-ink-900">{formatCurrency(item.netPay, currency)}</td>
+                  <td data-label="Basic">{formatCurrency(item.basicSalary, itemCur)}</td>
+                  <td data-label="Allowances">{formatCurrency(item.totalAllowances, itemCur)}</td>
+                  <td data-label="Overtime">{formatCurrency(item.overtimeAmount, itemCur)}</td>
+                  <td data-label="Deductions" className="text-red-600">{formatCurrency(item.totalDeductions, itemCur)}</td>
+                  <td data-label="Gross">{formatCurrency(item.grossPay, itemCur)}</td>
+                  <td data-label="Net Pay" className="font-semibold text-ink-900">{formatCurrency(item.netPay, itemCur)}</td>
                   <td data-label="Days">{item.presentDays}/{item.workingDays}</td>
                   <td>
                     <Link href={`/payroll/${payroll.id}/${item.id}`} className="text-sm font-medium text-brand-600 hover:text-brand-700">
@@ -83,14 +88,15 @@ export default async function PayrollDetailPage({ params }: { params: { id: stri
                     </Link>
                   </td>
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
             <tfoot>
               <tr className="border-t-2 border-ink-200 bg-ink-50 font-semibold">
                 <td>Total</td>
                 <td colSpan={4}></td>
-                <td>{formatCurrency(payroll.totalGross, currency)}</td>
-                <td>{formatCurrency(payroll.totalNet, currency)}</td>
+                <td>{formatCurrency(payroll.totalGross, payrollCurrency)}</td>
+                <td>{formatCurrency(payroll.totalNet, payrollCurrency)}</td>
                 <td colSpan={2}></td>
               </tr>
             </tfoot>

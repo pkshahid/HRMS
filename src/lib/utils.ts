@@ -9,11 +9,17 @@ export function cn(...inputs: ClassValue[]) {
 export function formatCurrency(amount: number | string | { toNumber(): number }, currency = "AED") {
   const num = typeof amount === "number" ? amount : typeof amount === "string" ? parseFloat(amount) : amount.toNumber();
   if (isNaN(num)) return `${currency} 0`;
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency,
-    maximumFractionDigits: 2,
-  }).format(num);
+  try {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency,
+      maximumFractionDigits: 2,
+    }).format(num);
+  } catch {
+    // Fall back to a plain format if the currency code is not a valid ISO 4217 code
+    // (e.g. legacy free-text values predating the currency dropdown).
+    return `${currency} ${num.toLocaleString("en-US", { maximumFractionDigits: 2 })}`;
+  }
 }
 
 export function formatDate(date: Date | string, opts?: Intl.DateTimeFormatOptions) {

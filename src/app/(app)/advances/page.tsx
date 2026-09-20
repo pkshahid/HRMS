@@ -6,6 +6,7 @@ import { AdvanceStatus } from "@prisma/client";
 import Link from "next/link";
 import { HandCoins, Clock, CheckCircle, TrendingUp } from "lucide-react";
 import { AdvanceStatusBadge, AdvanceTypeBadge, ProgressBar } from "@/components/expenses/expense-ui";
+import { normalizeCurrency } from "@/lib/currency";
 
 export default async function AdvancesPage({
   searchParams,
@@ -37,7 +38,8 @@ export default async function AdvancesPage({
     }),
   ]);
 
-  const currency = advances[0]?.currency || "AED";
+  const tenant = await prisma.tenant.findUnique({ where: { id: user.tenantId! }, select: { currency: true } });
+  const currency = normalizeCurrency(tenant?.currency);
 
   return (
     <>

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/auth";
 import { UserRole } from "@prisma/client";
+import { normalizeCurrency } from "@/lib/currency";
 
 type Ctx = { params: { id: string } };
 
@@ -12,7 +13,7 @@ export async function PATCH(req: NextRequest, ctx: Ctx) {
   if (body.name) data.name = body.name;
   if (body.status) data.status = body.status;
   if (body.plan) data.plan = body.plan;
-  if (body.currency) data.currency = body.currency;
+  if (body.currency) data.currency = normalizeCurrency(body.currency);
   if (body.country !== undefined) data.country = body.country;
 
   const tenant = await prisma.tenant.update({ where: { id: ctx.params.id }, data });

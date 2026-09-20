@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { initials, formatCurrency } from "@/lib/utils";
 import { Wallet, X, Loader2, Save } from "lucide-react";
+import { CurrencySelect } from "@/components/ui/currency-select";
 
 type Emp = {
   id: string;
@@ -12,6 +13,7 @@ type Emp = {
   designation?: string | null;
   department: string;
   hasStructure: boolean;
+  currency: string;
   gross: number | null;
 };
 
@@ -32,6 +34,7 @@ export function SalaryListClient({
   const [error, setError] = useState("");
 
   const [form, setForm] = useState({
+    currency: currency,
     basicSalary: "0",
     housingAllowance: "0",
     transportAllowance: "0",
@@ -45,8 +48,9 @@ export function SalaryListClient({
   function openEditor(emp: Emp) {
     setEditing(emp);
     setError("");
-    // fetch existing via API not needed; default to 0 — admin can fill
+    // default to the employee's existing currency, or the tenant default
     setForm({
+      currency: emp.currency || currency,
       basicSalary: "0", housingAllowance: "0", transportAllowance: "0",
       foodAllowance: "0", otherAllowance: "0", overtimeRate: "0",
       taxRate: "0", insuranceRate: "0",
@@ -60,6 +64,7 @@ export function SalaryListClient({
       const s = structures.find((x: any) => x.employeeId === empId);
       if (s) {
         setForm({
+          currency: s.currency || currency,
           basicSalary: String(s.basicSalary),
           housingAllowance: String(s.housingAllowance),
           transportAllowance: String(s.transportAllowance),
@@ -104,7 +109,7 @@ export function SalaryListClient({
       <div className="card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="table-base">
-            <thead><tr><th>Employee</th><th>Department</th><th>Designation</th><th>Gross Monthly</th><th>Status</th><th></th></tr></thead>
+            <thead><tr><th>Employee</th><th>Department</th><th>Designation</th><th>Currency</th><th>Gross Monthly</th><th>Status</th><th></th></tr></thead>
             <tbody>
               {employees.map((e) => (
                 <tr key={e.id}>
@@ -119,7 +124,8 @@ export function SalaryListClient({
                   </td>
                   <td data-label="Department">{e.department}</td>
                   <td data-label="Designation">{e.designation || "—"}</td>
-                  <td data-label="Gross Monthly" className="font-medium text-ink-900">{e.gross !== null ? formatCurrency(e.gross, currency) : "—"}</td>
+                  <td data-label="Currency" className="font-mono text-xs text-ink-600">{e.currency}</td>
+                  <td data-label="Gross Monthly" className="font-medium text-ink-900">{e.gross !== null ? formatCurrency(e.gross, e.currency) : "—"}</td>
                   <td data-label="Status">{e.hasStructure ? <span className="badge-green">Configured</span> : <span className="badge-gray">Not set</span>}</td>
                   <td>
                     <button
@@ -147,6 +153,11 @@ export function SalaryListClient({
               <button onClick={() => setEditing(null)} className="rounded-md p-1 text-ink-400 hover:bg-ink-100"><X className="h-5 w-5" /></button>
             </div>
 
+            <div className="mb-4">
+              <label className="label">Currency</label>
+              <CurrencySelect value={form.currency} onChange={(v) => set("currency", v)} />
+            </div>
+
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Basic salary" value={form.basicSalary} onChange={(v) => set("basicSalary", v)} />
               <Field label="Housing allowance" value={form.housingAllowance} onChange={(v) => set("housingAllowance", v)} />
@@ -160,7 +171,7 @@ export function SalaryListClient({
 
             <div className="mt-4 flex items-center justify-between rounded-lg bg-brand-50 px-4 py-3">
               <span className="text-sm font-medium text-brand-700">Gross Monthly</span>
-              <span className="text-lg font-semibold text-brand-700">{formatCurrency(gross, currency)}</span>
+              <span className="text-lg font-semibold text-brand-700">{formatCurrency(gross, form.currency)}</span>
             </div>
 
             {error && <div className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>}

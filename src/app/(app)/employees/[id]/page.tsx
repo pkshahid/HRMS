@@ -8,6 +8,7 @@ import Link from "next/link";
 import { ArrowLeft, Pencil, Mail, Phone, MapPin, Globe, FileText } from "lucide-react";
 import { UserRole } from "@prisma/client";
 import { EmployeeDetailTabs } from "@/components/employees/employee-detail-tabs";
+import { normalizeCurrency } from "@/lib/currency";
 
 export default async function EmployeeDetailPage({ params }: { params: { id: string } }) {
   const user = await requireRole(UserRole.ADMIN, UserRole.MANAGER, UserRole.STAFF, UserRole.EMPLOYEE);
@@ -33,7 +34,7 @@ export default async function EmployeeDetailPage({ params }: { params: { id: str
   if (user.role === UserRole.EMPLOYEE && employee.id !== user.employeeId) notFound();
 
   const canEdit = user.role === UserRole.ADMIN || user.role === UserRole.STAFF;
-  const currency = (await prisma.tenant.findUnique({ where: { id: user.tenantId! } }))?.currency || "AED";
+  const tenantCurrency = normalizeCurrency((await prisma.tenant.findUnique({ where: { id: user.tenantId! } }))?.currency);
 
   const fullName = `${employee.firstName} ${employee.lastName}`;
 
@@ -110,7 +111,7 @@ export default async function EmployeeDetailPage({ params }: { params: { id: str
             attendances={employee.attendances}
             leaves={employee.leaves}
             salaryStructure={employee.salaryStructure}
-            currency={currency}
+            currency={tenantCurrency}
             canEdit={canEdit}
             expenses={employee.expenses}
             advances={employee.advances}

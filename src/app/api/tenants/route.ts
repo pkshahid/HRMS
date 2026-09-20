@@ -4,6 +4,7 @@ import { requireRole } from "@/lib/auth";
 import { UserRole } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
+import { normalizeCurrency } from "@/lib/currency";
 
 const createSchema = z.object({
   name: z.string().min(1),
@@ -44,7 +45,7 @@ export async function POST(req: NextRequest) {
       name: d.name,
       slug: d.slug,
       country: d.country || null,
-      currency: d.currency,
+      currency: normalizeCurrency(d.currency),
       timezone: d.timezone,
       plan: d.plan,
     },

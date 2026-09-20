@@ -6,6 +6,7 @@ import { ExpenseStatus } from "@prisma/client";
 import Link from "next/link";
 import { CreditCard, Clock, CheckCircle, DollarSign } from "lucide-react";
 import { ExpenseStatusBadge } from "@/components/expenses/expense-ui";
+import { normalizeCurrency } from "@/lib/currency";
 
 export default async function ExpensesPage({
   searchParams,
@@ -37,7 +38,8 @@ export default async function ExpensesPage({
     }),
   ]);
 
-  const currency = claims[0]?.currency || "AED";
+  const tenant = await prisma.tenant.findUnique({ where: { id: user.tenantId! }, select: { currency: true } });
+  const currency = normalizeCurrency(tenant?.currency);
 
   return (
     <>

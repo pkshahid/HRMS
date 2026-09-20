@@ -39,13 +39,14 @@ export default async function TenantsPage() {
       <div className="card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="table-base">
-            <thead><tr><th>Organization</th><th>Slug</th><th>Country</th><th>Plan</th><th>Status</th><th>Employees</th><th>Users</th><th>Created</th><th></th></tr></thead>
+            <thead><tr><th>Organization</th><th>Slug</th><th>Country</th><th>Currency</th><th>Plan</th><th>Status</th><th>Employees</th><th>Users</th><th>Created</th><th></th></tr></thead>
             <tbody>
               {tenants.map((t) => (
                 <tr key={t.id}>
                   <td data-label="Organization" className="font-medium text-ink-900">{t.name}</td>
                   <td data-label="Slug" className="font-mono text-xs text-ink-500">{t.slug}</td>
                   <td data-label="Country">{t.country || "—"}</td>
+                  <td data-label="Currency" className="font-mono text-xs text-ink-600">{t.currency}</td>
                   <td data-label="Plan" className="capitalize"><span className="badge-blue">{t.plan}</span></td>
                   <td data-label="Status"><StatusBadge status={t.status} /></td>
                   <td data-label="Employees">{t._count.employees}</td>

@@ -222,6 +222,8 @@ function SalaryTab({ salaryStructure, currency, canEdit, employeeId }: { salaryS
       </div>
     );
   }
+  // Use the salary structure's own currency, falling back to the tenant currency.
+  const cur = salaryStructure.currency || currency;
   const gross =
     Number(salaryStructure.basicSalary) +
     Number(salaryStructure.housingAllowance) +
@@ -230,17 +232,20 @@ function SalaryTab({ salaryStructure, currency, canEdit, employeeId }: { salaryS
     Number(salaryStructure.otherAllowance);
   return (
     <div>
+      <div className="mb-3 flex items-center gap-2">
+        <span className="text-xs font-mono text-ink-500">{cur}</span>
+      </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <SalaryItem label="Basic Salary" value={formatCurrency(salaryStructure.basicSalary, currency)} />
-        <SalaryItem label="Housing Allowance" value={formatCurrency(salaryStructure.housingAllowance, currency)} />
-        <SalaryItem label="Transport Allowance" value={formatCurrency(salaryStructure.transportAllowance, currency)} />
-        <SalaryItem label="Food Allowance" value={formatCurrency(salaryStructure.foodAllowance, currency)} />
-        <SalaryItem label="Other Allowance" value={formatCurrency(salaryStructure.otherAllowance, currency)} />
-        <SalaryItem label="Overtime Rate / hr" value={formatCurrency(salaryStructure.overtimeRate, currency)} />
+        <SalaryItem label="Basic Salary" value={formatCurrency(salaryStructure.basicSalary, cur)} />
+        <SalaryItem label="Housing Allowance" value={formatCurrency(salaryStructure.housingAllowance, cur)} />
+        <SalaryItem label="Transport Allowance" value={formatCurrency(salaryStructure.transportAllowance, cur)} />
+        <SalaryItem label="Food Allowance" value={formatCurrency(salaryStructure.foodAllowance, cur)} />
+        <SalaryItem label="Other Allowance" value={formatCurrency(salaryStructure.otherAllowance, cur)} />
+        <SalaryItem label="Overtime Rate / hr" value={formatCurrency(salaryStructure.overtimeRate, cur)} />
       </div>
       <div className="mt-4 flex items-center justify-between rounded-lg bg-brand-50 px-4 py-3">
         <span className="text-sm font-medium text-brand-700">Gross Monthly</span>
-        <span className="text-lg font-semibold text-brand-700">{formatCurrency(gross, currency)}</span>
+        <span className="text-lg font-semibold text-brand-700">{formatCurrency(gross, cur)}</span>
       </div>
       <div className="mt-3 grid gap-4 sm:grid-cols-2">
         <SalaryItem label="Tax Rate" value={`${salaryStructure.taxRate}%`} />

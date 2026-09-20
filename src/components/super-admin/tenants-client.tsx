@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, X, Loader2, MoreVertical, Trash2, Pause, Play } from "lucide-react";
+import { CurrencySelect } from "@/components/ui/currency-select";
 
 type Tenant = {
   id: string;
@@ -111,7 +112,7 @@ export function TenantsClient({ mode, tenant }: { mode: "create" | "row"; tenant
                 <Field label="Name" error={error.name}><input className="input" value={form.name} onChange={(e) => set("name", e.target.value)} required /></Field>
                 <Field label="Slug" error={error.slug} hint="lowercase, hyphens"><input className="input" value={form.slug} onChange={(e) => set("slug", e.target.value.toLowerCase())} placeholder="my-company" required /></Field>
                 <Field label="Country"><input className="input" value={form.country} onChange={(e) => set("country", e.target.value)} /></Field>
-                <Field label="Currency"><input className="input" value={form.currency} onChange={(e) => set("currency", e.target.value)} /></Field>
+                <Field label="Currency"><CurrencySelect value={form.currency} onChange={(v) => set("currency", v)} /></Field>
                 <Field label="Timezone"><input className="input" value={form.timezone} onChange={(e) => set("timezone", e.target.value)} /></Field>
                 <Field label="Plan">
                   <select className="input" value={form.plan} onChange={(e) => set("plan", e.target.value)}>

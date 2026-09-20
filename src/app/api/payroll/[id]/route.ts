@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/auth";
 import { UserRole, PayrollStatus } from "@prisma/client";
+import { notifyPayrollPaid } from "@/lib/notifications";
+import { notifyPayrollPaidTelegram } from "@/lib/telegram-notifications";
+import { normalizeCurrency } from "@/lib/currency";
 
 type Ctx = { params: { id: string } };
 
@@ -33,6 +36,30 @@ export async function PATCH(req: NextRequest, ctx: Ctx) {
 
   if (newStatus === "PAID") {
     await prisma.payrollItem.updateMany({ where: { payrollId: ctx.params.id }, data: { status: "paid" } });
+
+    // Send payroll-paid notifications (email + Telegram) per employee using the item's currency.
+    const items = await prisma.payrollItem.findMany({
+      where: { payrollId: ctx.params.id },
+      include: { employee: { select: { userId: true } } },
+    });
+    const payrollCurrency = normalizeCurrency(updated.currency);
+    for (const item of items) {
+      const itemCurrency = normalizeCurrency(item.currency, payrollCurrency);
+      notifyPayrollPaid(user.tenantId!, item.employeeId, {
+        name: updated.name,
+        netPay: item.netPay,
+        currency: itemCurrency,
+        periodStart: updated.periodStart,
+        periodEnd: updated.periodEnd,
+      }).catch(() => {});
+      notifyPayrollPaidTelegram(user.tenantId!, item.employee.userId, item.employeeId, {
+        name: updated.name,
+        netPay: item.netPay,
+        currency: itemCurrency,
+        periodStart: updated.periodStart,
+        periodEnd: updated.periodEnd,
+      }).catch(() => {});
+    }
   }
 
   return NextResponse.json({ payroll: updated });
